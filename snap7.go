@@ -24,15 +24,14 @@ const (
 )
 
 type Snap7Client struct {
-	inner C.ulong
+	inner C.S7Object
 }
 
 func ConnentTo(address string, rack int, slot int) (Snap7Client, error) {
-	var client C.ulong = C.Cli_Create()
+	var client C.S7Object = C.Cli_Create()
 	var addr *C.char = C.CString(address)
 
 	var err C.int = C.Cli_ConnectTo(client, addr, C.int(rack), C.int(slot))
-	fmt.Println(err)
 	if err != 0 {
 		return Snap7Client{}, ErrIsoConnect
 	}
