@@ -1,7 +1,6 @@
 package snap7
 
 import (
-	"fmt"
 	"unsafe"
 )
 
@@ -33,6 +32,7 @@ func ConnentTo(address string, rack int, slot int) (Snap7Client, error) {
 
 	var err C.int = C.Cli_ConnectTo(client, addr, C.int(rack), C.int(slot))
 	if err != 0 {
+		C.Cli_Destroy(&client)
 		return Snap7Client{}, ErrIsoConnect
 	}
 
@@ -49,6 +49,7 @@ func (client *Snap7Client) ReadArea(area int, db_number int, start int, amount i
 
 	var err C.int = C.Cli_ReadArea(client.inner, C.int(area), C.int(db_number), C.int(start), C.int(amount), C.S7WLByte, unsafe.Pointer(&buff[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return nil, convertError(int(err))
 	}
 
@@ -60,6 +61,7 @@ func (client *Snap7Client) WriteArea(area int, db_number int, start int, data []
 
 	var err C.int = C.Cli_WriteArea(client.inner, C.int(area), C.int(db_number), C.int(start), C.int(data_len), C.S7WLByte, unsafe.Pointer(&data[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return convertError(int(err))
 	}
 
@@ -71,6 +73,7 @@ func (client *Snap7Client) DBRead(db_number int, start int, size int) ([]byte, e
 
 	var err C.int = C.Cli_DBRead(client.inner, C.int(db_number), C.int(start), C.int(size), unsafe.Pointer(&buff[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return nil, convertError(int(err))
 	}
 
@@ -82,6 +85,7 @@ func (client *Snap7Client) DBWrite(db_number, start int, data []byte) error {
 
 	var err C.int = C.Cli_DBWrite(client.inner, C.int(db_number), C.int(start), C.int(data_len), unsafe.Pointer(&data[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return convertError(int(err))
 	}
 
@@ -93,6 +97,7 @@ func (client *Snap7Client) MBRead(start int, size int) ([]byte, error) {
 
 	var err C.int = C.Cli_MBRead(client.inner, C.int(start), C.int(size), unsafe.Pointer(&buff[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return nil, convertError(int(err))
 	}
 
@@ -104,6 +109,7 @@ func (client *Snap7Client) MBWrite(start int, data []byte) error {
 
 	var err C.int = C.Cli_MBWrite(client.inner, C.int(start), C.int(data_len), unsafe.Pointer(&data[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return convertError(int(err))
 	}
 
@@ -115,6 +121,7 @@ func (client *Snap7Client) EBRead(start int, size int) ([]byte, error) {
 
 	var err C.int = C.Cli_EBRead(client.inner, C.int(start), C.int(size), unsafe.Pointer(&buff[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return nil, convertError(int(err))
 	}
 
@@ -126,6 +133,7 @@ func (client *Snap7Client) EBWrite(start int, data []byte) error {
 
 	var err C.int = C.Cli_EBWrite(client.inner, C.int(start), C.int(data_len), unsafe.Pointer(&data[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return convertError(int(err))
 	}
 
@@ -137,6 +145,7 @@ func (client *Snap7Client) ABRead(start int, size int) ([]byte, error) {
 
 	var err C.int = C.Cli_ABRead(client.inner, C.int(start), C.int(size), unsafe.Pointer(&buff[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return nil, convertError(int(err))
 	}
 
@@ -148,6 +157,7 @@ func (client *Snap7Client) ABWrite(start int, data []byte) error {
 
 	var err C.int = C.Cli_ABWrite(client.inner, C.int(start), C.int(data_len), unsafe.Pointer(&data[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return convertError(int(err))
 	}
 
@@ -158,8 +168,8 @@ func (client *Snap7Client) TMRead(start int, amount int) ([]byte, error) {
 	buff := make([]byte, amount)
 
 	var err C.int = C.Cli_TMRead(client.inner, C.int(start), C.int(amount), unsafe.Pointer(&buff[0]))
-	fmt.Println(err)
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return nil, convertError(int(err))
 	}
 
@@ -171,6 +181,7 @@ func (client *Snap7Client) TMWrite(start int, data []byte) error {
 
 	var err C.int = C.Cli_TMWrite(client.inner, C.int(start), C.int(data_len), unsafe.Pointer(&data[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return convertError(int(err))
 	}
 
@@ -182,6 +193,7 @@ func (client *Snap7Client) CTRead(start int, amount int) ([]byte, error) {
 
 	var err C.int = C.Cli_CTRead(client.inner, C.int(start), C.int(amount), unsafe.Pointer(&buff[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return nil, convertError(int(err))
 	}
 
@@ -193,6 +205,7 @@ func (client *Snap7Client) CTWrite(start int, data []byte) error {
 
 	var err C.int = C.Cli_CTWrite(client.inner, C.int(start), C.int(data_len), unsafe.Pointer(&data[0]))
 	if err != 0 {
+		C.Cli_Destroy(&client.inner)
 		return convertError(int(err))
 	}
 
