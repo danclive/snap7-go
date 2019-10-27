@@ -26,14 +26,51 @@ type Snap7Client struct {
 	inner C.S7Object
 }
 
-func ConnentTo(address string, rack int, slot int) (Snap7Client, error) {
+func ConnentTo(address string, rack int, slot int, ConnectionType uint16) (Snap7Client, error) {
 	var client C.S7Object = C.Cli_Create()
+
+	if ConnectionType > 0 {
+		var err C.int = C.Cli_SetConnectionType(client, C.ushort(ConnectionType))
+		if err != 0 {
+			C.Cli_Destroy(&client)
+			return Snap7Client{}, ErrIsoConnect
+		}
+	}
+
 	var addr *C.char = C.CString(address)
 
 	var err C.int = C.Cli_ConnectTo(client, addr, C.int(rack), C.int(slot))
 	if err != 0 {
 		C.Cli_Destroy(&client)
 		return Snap7Client{}, ErrIsoConnect
+	}
+
+	return Snap7Client{inner: client}, nil
+}
+
+func ConnentTo2(address string, LocalTSAP uint16, RemoteTSAP uint16, ConnectionType uint16) (Snap7Client, error) {
+	var client C.S7Object = C.Cli_Create()
+
+	if ConnectionType > 0 {
+		var err C.int = C.Cli_SetConnectionType(client, C.ushort(ConnectionType))
+		if err != 0 {
+			C.Cli_Destroy(&client)
+			return Snap7Client{}, ErrIsoConnect
+		}
+	}
+
+	var addr *C.char = C.CString(address)
+
+	var err C.int = C.Cli_SetConnectionParams(client, addr, C.ushort(LocalTSAP), C.ushort(RemoteTSAP))
+	if err != 0 {
+		C.Cli_Destroy(&client)
+		return Snap7Client{}, ErrIsoInvalidParams
+	}
+
+	var err2 C.int = C.Cli_Connect(client)
+	if err2 != 0 {
+		C.Cli_Destroy(&client)
+		return Snap7Client{}, ErrIsoInvalidParams
 	}
 
 	return Snap7Client{inner: client}, nil
