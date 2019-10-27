@@ -70,7 +70,7 @@ func ConnentTo2(address string, LocalTSAP uint16, RemoteTSAP uint16, ConnectionT
 	var err2 C.int = C.Cli_Connect(client)
 	if err2 != 0 {
 		C.Cli_Destroy(&client)
-		return Snap7Client{}, ErrIsoInvalidParams
+		return Snap7Client{}, ErrIsoConnect
 	}
 
 	return Snap7Client{inner: client}, nil
